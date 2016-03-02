@@ -1,0 +1,246 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>zkStat -- zookeeper监控工具 | 白一</title>
+  <meta name="author" content="白一">
+  
+  <meta name="description" content="概述taokeeper的简化版，100多行的脚本代替taokeeper成千上万的java代码。当然taokeeper支持并发计算，且具有一个简单的显示界面。而zkStat则只是简单的响应json数据，但重在够轻量。">
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <meta property="og:title" content="zkStat -- zookeeper监控工具"/>
+  <meta property="og:site_name" content="白一"/>
+
+  
+    <meta property="og:image" content="undefined"/>
+  
+
+  <link href="/favicon.png" rel="icon">
+  <link rel="alternate" href="/atom.xml" title="白一" type="application/atom+xml">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+  <!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+  
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'undefined', 'auto');
+	ga('send', 'pageview');
+
+</script>
+
+
+</head>
+
+
+<body>
+  <header id="header" class="inner"><div class="alignleft">
+  <h1><a href="/">白一</a></h1>
+  <h2><a href="/"></a></h2>
+</div>
+<nav id="main-nav" class="alignright">
+  <ul>
+    
+      <li><a href="/">Home</a></li>
+    
+      <li><a href="/archives">Archives</a></li>
+    
+      <li><a href="/about">About</a></li>
+    
+      <li><a href="/atom.xml">RSS</a></li>
+    
+  </ul>
+  <div class="clearfix"></div>
+</nav>
+<div class="clearfix"></div></header>
+  <div id="content" class="inner">
+    <div id="main-col" class="alignleft"><div id="wrapper"><article class="post">
+  
+  <div class="post-content">
+    <header>
+      
+        <div class="icon"></div>
+        <time datetime="2012-09-10T16:00:00.000Z"><a href="/2012/09/11/shell/zookeep_stat/">2012-09-11</a></time>
+      
+      
+  
+    <h1 class="title">zkStat -- zookeeper监控工具</h1>
+  
+
+    </header>
+    <div class="entry">
+      
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>taokeeper的简化版，100多行的脚本代替taokeeper成千上万的java代码。当然taokeeper支持并发计算，且具有一个简单的显示界面。而zkStat则只是简单的响应json数据，但重在够轻量。</p>
+<a id="more"></a>
+<h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span><br><span class="line"></span></span><br><span class="line"><span class="comment">#date</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#192.168.3.171:2181,192.168.3.172:2181,192.168.3.173:2181</span></span><br><span class="line">zk_server=`<span class="built_in">echo</span> <span class="variable">$1</span> |sed <span class="string">'s/,/ /g'</span>`</span><br><span class="line"></span><br><span class="line">op_<span class="built_in">type</span>=<span class="variable">$2</span></span><br><span class="line"></span><br><span class="line"><span class="comment">################################################</span></span><br><span class="line"><span class="comment"># result like below:</span></span><br><span class="line"><span class="comment">################################################</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">#	&#123;</span></span><br><span class="line"><span class="comment">#		stat_date:"2013-01-22",</span></span><br><span class="line"><span class="comment">#		stat_datetime:"2013-01-22 12:25:25",</span></span><br><span class="line"><span class="comment">#		err_msg:"",</span></span><br><span class="line"><span class="comment">#		[</span></span><br><span class="line"><span class="comment">#			&#123;</span></span><br><span class="line"><span class="comment">#				server:192.168.3.171:2181,</span></span><br><span class="line"><span class="comment">#				status:ok,</span></span><br><span class="line"><span class="comment">#				role:leader,</span></span><br><span class="line"><span class="comment">#				connection:10,</span></span><br><span class="line"><span class="comment">#				watch:89,</span></span><br><span class="line"><span class="comment">#				watched_node:64,</span></span><br><span class="line"><span class="comment">#				total_node:547</span></span><br><span class="line"><span class="comment">#				sent_times:1111111,</span></span><br><span class="line"><span class="comment">#				recv_times:2222222,</span></span><br><span class="line"><span class="comment">#				conn_detail:"",</span></span><br><span class="line"><span class="comment">#				watch_detail:"",</span></span><br><span class="line"><span class="comment">#				stat_detail:""</span></span><br><span class="line"><span class="comment">#			&#125;,</span></span><br><span class="line"><span class="comment">#			&#123;</span></span><br><span class="line"><span class="comment">#				server:192.168.3.172:2181,</span></span><br><span class="line"><span class="comment">#				status:ok,</span></span><br><span class="line"><span class="comment">#				role:leader,</span></span><br><span class="line"><span class="comment">#				connection:10,</span></span><br><span class="line"><span class="comment">#				watch:89,</span></span><br><span class="line"><span class="comment">#				watched_node:64,</span></span><br><span class="line"><span class="comment">#				total_node:547</span></span><br><span class="line"><span class="comment">#				sent_times:1111111,</span></span><br><span class="line"><span class="comment">#				recv_times:2222222,</span></span><br><span class="line"><span class="comment">#				conn_detail:"",</span></span><br><span class="line"><span class="comment">#				watch_detail:"",</span></span><br><span class="line"><span class="comment">#				stat_detail:""</span></span><br><span class="line"><span class="comment">#			&#125;</span></span><br><span class="line"><span class="comment">#		]</span></span><br><span class="line"><span class="comment">#	&#125;</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment">################################################</span></span><br><span class="line">result=<span class="string">""</span></span><br><span class="line">cmd=nc</span><br><span class="line"><span class="keyword">if</span> [ -z <span class="string">"`whereis <span class="variable">$cmd</span> |fgrep '/'`"</span> ]; <span class="keyword">then</span></span><br><span class="line">	result=<span class="string">"&#123;</span><br><span class="line">				\"err_msg\":\"no <span class="variable">$cmd</span> command\",</span><br><span class="line">				\"server_list\":[]</span><br><span class="line">			&#125;"</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$result</span>;</span><br><span class="line">	<span class="built_in">exit</span> 1</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">realtime_monitor</span></span>()</span><br><span class="line">&#123;</span><br><span class="line">	zs=<span class="variable">$1</span></span><br><span class="line">	zk=`<span class="built_in">echo</span> <span class="variable">$zs</span> |sed <span class="string">'s/:/ /'</span>`				</span><br><span class="line"></span><br><span class="line">	server_info=<span class="string">""</span></span><br><span class="line">	<span class="built_in">stat</span>_datetime=`date +<span class="string">"%Y-%m-%d %T"</span>`</span><br><span class="line">	<span class="built_in">stat</span>_date=`date +<span class="string">"%Y-%m-%d"</span>`</span><br><span class="line"></span><br><span class="line">	ruok_content=`<span class="built_in">echo</span> ruok |<span class="variable">$cmd</span> <span class="variable">$zk</span>`</span><br><span class="line">	cons_content=`<span class="built_in">echo</span> cons	|<span class="variable">$cmd</span> <span class="variable">$zk</span> |sed <span class="string">'s/$/&lt;BR&gt;/'</span> |grep <span class="string">',sid='</span>`</span><br><span class="line">	wchs_content=`<span class="built_in">echo</span> wchs	|<span class="variable">$cmd</span> <span class="variable">$zk</span> |sed <span class="string">'s/$/&lt;BR&gt;/'</span>`</span><br><span class="line">	wchc_content=`<span class="built_in">echo</span> wchc	|<span class="variable">$cmd</span> <span class="variable">$zk</span> |sed <span class="string">'s/$/&lt;BR&gt;/'</span>`</span><br><span class="line">	<span class="built_in">stat</span>_content=`<span class="built_in">echo</span> <span class="built_in">stat</span>	|<span class="variable">$cmd</span> <span class="variable">$zk</span> |sed <span class="string">'s/$/&lt;BR&gt;/'</span>`</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> [ -z <span class="variable">$ruok_content</span> ]; <span class="keyword">then</span></span><br><span class="line">		server_info=<span class="string">"&#123;</span><br><span class="line">				\"server\":\"<span class="variable">$zs</span>\",</span><br><span class="line">				\"stat_date\":\"<span class="variable">$stat_date</span>\",</span><br><span class="line">				\"stat_datetime\":\"<span class="variable">$stat_datetime</span>\",</span><br><span class="line">				\"status\":\"ERROR\",</span><br><span class="line">				\"role\":\"\",</span><br><span class="line">				\"connection\":\"\",</span><br><span class="line">				\"watch\":\"\",</span><br><span class="line">				\"watched_node\":\"\",</span><br><span class="line">				\"total_node\":\"\",</span><br><span class="line">				\"sent_times\":\"\",</span><br><span class="line">				\"recv_times\":\"\",</span><br><span class="line">				\"conn_detail\":\"\",</span><br><span class="line">				\"watch_detail\":\"\",</span><br><span class="line">				\"stat_detail\":\"\"</span><br><span class="line">			&#125;"</span></span><br><span class="line">		<span class="built_in">return</span> 1;</span><br><span class="line">	<span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">	cons_count=`<span class="built_in">echo</span> <span class="variable">$cons_content</span>  |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |sed <span class="string">'/^\s*$/d'</span> |wc <span class="_">-l</span>`</span><br><span class="line">	cons_detail=`<span class="built_in">echo</span> <span class="variable">$cons_content</span> |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |sed <span class="string">'/^\s*$/d'</span> \</span><br><span class="line">				|awk -F <span class="string">'[:(=,)]'</span> <span class="string">'&#123; print $10": "$1", send to server: "$6", receive from server: "$8"&lt;BR&gt;" &#125;'</span>`</span><br><span class="line">	<span class="comment">#echo $cons_content | sed 's/&lt;BR&gt;\s*/\n/g' |sed '/^\s*$/d'</span></span><br><span class="line">	<span class="comment">#echo $cons_count</span></span><br><span class="line">	<span class="comment">#echo $cons_detail  |sed 's/&lt;BR&gt;\s*/\n/g'  |sed '/^\s*$/d'	</span></span><br><span class="line"></span><br><span class="line">	wchs_node_count=`<span class="built_in">echo</span> <span class="variable">$wchs_content</span> |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'connections'</span> |awk -F <span class="string">'[ :]'</span> <span class="string">'&#123;print $4&#125;'</span>`</span><br><span class="line">	wchs_count=`<span class="built_in">echo</span> <span class="variable">$wchs_content</span>  |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'Total watches'</span> |awk -F <span class="string">'[ :]'</span> <span class="string">'&#123;print $NF&#125;'</span>`</span><br><span class="line">	<span class="comment">#echo $wchs_content |sed 's/&lt;BR&gt;/\n/g' | sed '/^\s*$/d'</span></span><br><span class="line">	<span class="comment">#echo $wchs_node_count</span></span><br><span class="line">	<span class="comment">#echo $wchs_count</span></span><br><span class="line">	</span><br><span class="line">	<span class="comment">#echo $wchc_content |sed 's/&lt;BR&gt;\s*/\n/g;' |sed 's#^/#\t/#' |sed '/^\s*$/d'</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">stat</span>_mode=`<span class="built_in">echo</span> <span class="variable">$stat_content</span>  |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'Mode:'</span> |awk <span class="string">'&#123;print $NF&#125;'</span>`</span><br><span class="line">	<span class="built_in">stat</span>_nodes=`<span class="built_in">echo</span> <span class="variable">$stat_content</span> |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'Node count:'</span> |awk <span class="string">'&#123;print $NF&#125;'</span>`</span><br><span class="line">	<span class="built_in">stat</span>_recv=`<span class="built_in">echo</span> <span class="variable">$stat_content</span>  |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'Received:'</span> |awk <span class="string">'&#123;print $NF&#125;'</span>`</span><br><span class="line">	<span class="built_in">stat</span>_sent=`<span class="built_in">echo</span> <span class="variable">$stat_content</span>  |sed <span class="string">'s/&lt;BR&gt;/\n/g'</span> |grep <span class="string">'Sent:'</span> |awk <span class="string">'&#123;print $NF&#125;'</span>`</span><br><span class="line">	<span class="comment">#echo $stat_content  |sed 's/&lt;BR&gt;/\n/g'</span></span><br><span class="line">	<span class="comment">#echo $stat_mode</span></span><br><span class="line">	<span class="comment">#echo $stat_nodes</span></span><br><span class="line">	<span class="comment">#echo $stat_recv</span></span><br><span class="line">	<span class="comment">#echo $stat_sent</span></span><br><span class="line"></span><br><span class="line">	server_info=<span class="string">"&#123;</span><br><span class="line">		\"server\":\"<span class="variable">$zs</span>\",</span><br><span class="line">		\"stat_date\":\"<span class="variable">$stat_date</span>\",</span><br><span class="line">		\"stat_datetime\":\"<span class="variable">$stat_datetime</span>\",</span><br><span class="line">		\"status\":\"OK\",</span><br><span class="line">		\"role\":\"<span class="variable">$stat_mode</span>\",</span><br><span class="line">		\"connection\":\"<span class="variable">$cons_count</span>\",</span><br><span class="line">		\"watch\":\"<span class="variable">$wchs_count</span>\",</span><br><span class="line">		\"watched_node\":\"<span class="variable">$wchs_node_count</span>\",</span><br><span class="line">		\"total_node\":\"<span class="variable">$stat_nodes</span>\",</span><br><span class="line">		\"sent_times\":\"<span class="variable">$stat_sent</span>\",</span><br><span class="line">		\"recv_times\":\"<span class="variable">$stat_recv</span>\",</span><br><span class="line">		\"conn_detail\":\"<span class="variable">$cons_detail</span>\",</span><br><span class="line">		\"watch_detail\":\"<span class="variable">$wchc_content</span>\",</span><br><span class="line">		\"stat_detail\":\"<span class="variable">$stat_content</span>\"</span><br><span class="line">	&#125;"</span></span><br><span class="line">	<span class="built_in">return</span> 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">stat</span>_info=<span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> z <span class="keyword">in</span> <span class="variable">$zk_server</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	server_info=<span class="string">""</span></span><br><span class="line">	realtime_monitor <span class="variable">$z</span></span><br><span class="line">	<span class="built_in">stat</span>_info=<span class="string">"<span class="variable">$stat_info</span>,<span class="variable">$server_info</span>"</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">stat</span>_info=`<span class="built_in">echo</span> <span class="variable">$stat_info</span> |sed <span class="string">'s/^,//'</span>`</span><br><span class="line">result=<span class="string">"&#123;</span><br><span class="line">			\"err_msg\":\"\",</span><br><span class="line">            \"server_list\":[<span class="variable">$stat_info</span>]</span><br><span class="line">		&#125;"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$result</span></span><br><span class="line"><span class="comment">#date</span></span><br></pre></td></tr></table></figure>
+<h3 id="用法："><a href="#用法：" class="headerlink" title="用法："></a>用法：</h3><pre><code>$ ./zkStat.sh ip1:port1,ip2:port2,ip3:port3
+</code></pre>
+      
+    </div>
+    <footer>
+      
+        
+  
+  <div class="categories">
+    <a href="/categories/shell/">shell</a>
+  </div>
+
+        
+  
+  <div class="tags">
+    <a href="/tags/zookeeper/">zookeeper</a>, <a href="/tags/taokeeper/">taokeeper</a>
+  </div>
+
+        
+        <nav id="pagination">
+
+
+      
+        <a href="/2016/03/02/tool/markdown/favor/" class="alignleft prev">Prev</a>
+      
+
+      
+
+</nav>
+      
+      <div class="clearfix"></div>
+    </footer>
+  </div>
+</article>
+
+
+<section id="comment">
+  <h1 class="title">Comments</h1>
+
+    <div class="ds-thread" data-thread-key="2012/09/11/shell/zookeep_stat/" data-title="zkStat -- zookeeper监控工具" data-url="http://yoursite.com/2012/09/11/shell/zookeep_stat/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"undefined"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.unstable.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+     || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+  </section>
+  
+
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"3","bdPos":"right","bdTop":"100"}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+</div></div>
+    <aside id="sidebar" class="alignright">
+  <div class="search">
+  <form action="//google.com/search" method="get" accept-charset="utf-8">
+    <input type="search" name="q" results="0" placeholder="Search">
+    <input type="hidden" name="q" value="site:yoursite.com">
+  </form>
+</div>
+
+  
+<div class="widget tag">
+  <h3 class="title">Categories</h3>
+  <ul class="entry">
+  
+    <li><a href="/categories/C语言/">C语言</a><small>4</small></li>
+  
+    <li><a href="/categories/favor/">favor</a><small>2</small></li>
+  
+    <li><a href="/categories/shell/">shell</a><small>1</small></li>
+  
+    <li><a href="/categories/tool/">tool</a><small>4</small></li>
+  
+  </ul>
+</div>
+
+
+  
+<div class="widget tagcloud">
+  <h3 class="title">Tag Cloud</h3>
+  <div class="entry">
+    <a href="/tags/c/" style="font-size: 20px;">c</a> <a href="/tags/git/" style="font-size: 13.33px;">git</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/markdown/" style="font-size: 16.67px;">markdown</a> <a href="/tags/taokeeper/" style="font-size: 10px;">taokeeper</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a>
+  </div>
+</div>
+
+
+  
+<div class="widget tag">
+  <h3 class="title">Recent Posts</h3>
+  <ul class="entry">
+    
+      <li>
+        <a href="/2016/03/02/tool/hexo/favor/">hexo资源收藏</a>
+      </li>
+    
+      <li>
+        <a href="/2016/03/02/c/obj_program/">C语言与面向对象之封装(一)</a>
+      </li>
+    
+      <li>
+        <a href="/2016/03/02/c/obj_program3/">C语言与面向对象之继承(一)</a>
+      </li>
+    
+      <li>
+        <a href="/2016/03/02/c/obj_program4/">C语言与面向对象之继承(二)</a>
+      </li>
+    
+      <li>
+        <a href="/2016/03/02/tool/markdown/example/">Markdown例子</a>
+      </li>
+    
+  </ul>
+</div>
+
+</aside>
+    <div class="clearfix"></div>
+  </div>
+  <footer id="footer" class="inner"><div class="alignleft">
+  <!--
+  Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> 
+  Theme by <a href="https://github.com/qwong/hexo-theme-green-light" target="_blank">GreenLight</a> 
+  -->
+  
+  &copy; 2016 白一
+  
+</div>
+<div class="clearfix"></div>
+</footer>
+  <script src="/js/jquery.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+  $('.fancybox').fancybox();
+})(jQuery);
+</script>
+
+<div id="totop" style="position:fixed;bottom:50px;right:50px;cursor: pointer;">
+<a><img src="/imgs/scrollup.png"/></a>
+</div>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?undefined";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script src="/js/totop.js"></script>
+</body>
+</html>
